@@ -2,7 +2,13 @@ use crate::Result;
 use r2d2::Pool;
 use r2d2_sqlite::SqliteConnectionManager;
 
+pub struct DatabasePool {
+    pub pool: Pool<SqliteConnectionManager>,
+}
+
+
 impl DatabasePool {
+
     pub fn new(database_url: &str) -> Result<Self> {
 
         let manager = SqliteConnectionManager::file(database_url);
@@ -13,6 +19,10 @@ impl DatabasePool {
         let conn = pool.get()?;
         create_tables(&conn)?;
 
+        Ok(DatabasePool { pool })
+    }
+
+    pub fn get_connection(&self) -> Result<r2d2::PooledConnection<r2d2_sqlite::SqliteConnectionManager>> {
         Ok(self.pool.get()?)
     }
 }
